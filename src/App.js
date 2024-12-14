@@ -15,9 +15,11 @@ function App() {
     setAnalysisStage('initial');
     setPaperAnalysis(null);
     
+    const BACKEND_URL = 'http://localhost:5001';
+
     try {
       // Initial analysis - get sections and original text
-      const response = await fetch('http://localhost:5000/analyze-paper', {
+      const response = await fetch(`${BACKEND_URL}/analyze-paper`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +38,7 @@ function App() {
       
       // Get overall summary
       setAnalysisStage('overall_summary');
-      const summaryResponse = await fetch('http://localhost:5000/get-overall-summary', {
+      const summaryResponse = await fetch(`${BACKEND_URL}/get-overall-summary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ function App() {
       setAnalysisStage('section_summaries');
       const sectionSummaries = [];
       for (const section of initialData.sections) {
-        const sectionSummaryResponse = await fetch('http://localhost:5000/analyze-section', {
+        const sectionSummaryResponse = await fetch(`${BACKEND_URL}/analyze-section`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +87,7 @@ function App() {
       setAnalysisStage('references');
       const sectionReferences = [];
       for (const section of initialData.sections) {
-        const referencesResponse = await fetch('http://localhost:5000/analyze-section', {
+          const referencesResponse = await fetch(`${BACKEND_URL}/analyze-section`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

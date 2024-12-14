@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import autogen
 import json
-import fitz  # PyMuPDF
-import cv2
 import numpy as np
 from PIL import Image
 import io
@@ -13,8 +11,17 @@ import requests
 import PyPDF2
 from io import BytesIO
 
+from dotenv import load_dotenv
+load_dotenv()
+
+# Remove the duplicate Flask and CORS initialization
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {
+    "origins": ["http://localhost:3000"],
+    "methods": ["GET", "POST", "OPTIONS"],  # Added OPTIONS
+    "allow_headers": ["Content-Type"],
+    "supports_credentials": True
+}})
 
 # Configure AutoGen
 config_list = [
@@ -23,6 +30,13 @@ config_list = [
         'api_key': os.getenv('OPENAI_API_KEY')
     }
 ]
+
+@app.route('/test-api-key', methods=['GET'])
+def test_api_key():
+    api_key = os.getenv('OPENAI_API_KEY')
+    if api_key:
+        return jsonify({'message': f'API key found: {api_key[:6]}...'})
+    return jsonify({'error': 'No API key found'}), 403
 
 @app.route('/analyze-paper', methods=['POST'])
 def analyze_paper():
@@ -208,4 +222,5 @@ def analyze_section():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Explicitly set host and port
+    app.run(host='0.0.0.0', port=5001, debug=True)
