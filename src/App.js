@@ -8,6 +8,16 @@ function App() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [error, setError] = useState(null);
   const [analysisStage, setAnalysisStage] = useState('initial'); // 'initial', 'summary', 'references'
+  const [selectedLanguage, setSelectedLanguage] = useState('en'); // Default to English
+  const languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Español' },
+    { value: 'fr', label: 'Français' },
+    { value: 'de', label: 'Deutsch' },
+    { value: 'zh', label: '中文' }
+  ];
+
+  const BACKEND_URL = 'http://localhost:5001';
 
   const analyzePaper = async () => {
     setLoading(true);
@@ -15,16 +25,21 @@ function App() {
     setAnalysisStage('initial');
     setPaperAnalysis(null);
     
-    const BACKEND_URL = 'http://localhost:5001';
-
+    console.log('Selected language before API call:', selectedLanguage); // Debug log
+    
     try {
       // Initial analysis - get sections and original text
       const response = await fetch(`${BACKEND_URL}/analyze-paper`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({
+          url,
+          language: selectedLanguage
+        }),
       });
       
       if (!response.ok) {
@@ -44,7 +59,8 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          fullText: initialData.sections.map(s => s.originalText).join('\n\n')
+          fullText: initialData.sections.map(s => s.originalText).join('\n\n'),
+          language: selectedLanguage
         }),
       });
       
@@ -68,7 +84,8 @@ function App() {
           },
           body: JSON.stringify({ 
             sectionText: section.originalText,
-            analysisType: 'summary'
+            analysisType: 'summary',
+            language: selectedLanguage
           }),
         });
         
@@ -94,7 +111,8 @@ function App() {
           },
           body: JSON.stringify({ 
             sectionText: section.originalText,
-            analysisType: 'references'
+            analysisType: 'references',
+            language: selectedLanguage
           }),
         });
         
@@ -135,6 +153,22 @@ function App() {
         <div className="header-section">
           <h1>Research Paper Analyzer</h1>
           <p className="subtitle-text">Make research papers accessible and interactive</p>
+          <div className="language-selector">
+            <select 
+              value={selectedLanguage}
+              onChange={(e) => {
+                console.log('Language changed to:', e.target.value); // Debug log
+                setSelectedLanguage(e.target.value);
+              }}
+              className="language-dropdown"
+            >
+              {languageOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {!paperAnalysis ? (

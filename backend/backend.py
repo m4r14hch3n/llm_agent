@@ -31,6 +31,48 @@ config_list = [
     }
 ]
 
+# Add a new translation agent
+def create_translation_agent(target_language):
+    return autogen.ConversableAgent(
+        name="translation_agent",
+        system_message=f"""
+        You are an expert translator. Translate the given JSON content into {target_language}.
+        Maintain the exact same JSON structure but translate all text values.
+        Do not translate:
+        - URLs
+        - Technical terms
+        - Citation numbers
+        - JSON keys
+        Keep all formatting and structure intact.
+        """,
+        llm_config={"config_list": config_list, "timeout": 60}
+    )
+
+# Add a translation function
+def translate_content(content, target_language):
+    if target_language.lower() == 'en':  # Skip translation if target is English
+        return content
+        
+    translation_agent = create_translation_agent(target_language)
+    user_proxy = autogen.UserProxyAgent(
+        name="user_proxy",
+        human_input_mode="NEVER",
+        max_consecutive_auto_reply=1,
+        code_execution_config={"use_docker": False}
+    )
+
+    chat_results = user_proxy.initiate_chats(
+        [
+            {
+                "recipient": translation_agent,
+                "message": f"Translate this content: {json.dumps(content)}",
+                "max_turns": 1
+            }
+        ]
+    )
+    
+    return json.loads(chat_results[-1].summary)
+
 @app.route('/test-api-key', methods=['GET'])
 def test_api_key():
     api_key = os.getenv('OPENAI_API_KEY')
@@ -41,6 +83,10 @@ def test_api_key():
 @app.route('/analyze-paper', methods=['POST'])
 def analyze_paper():
     data = request.get_json()
+    language = data.get('language', 'en')
+    print(f"Received request with data: {data}")  # Debug log
+    print(f"Language from request: {language}")   # Debug log
+    
     if not data or 'url' not in data:
         return jsonify({'error': 'No URL provided'}), 400
     
@@ -109,6 +155,9 @@ def analyze_paper():
 @app.route('/get-overall-summary', methods=['POST'])
 def get_overall_summary():
     data = request.get_json()
+    language = data.get('language', 'en')
+    print(f"Overall summary request - Language: {language}")  # Debug log
+    
     if not data or 'fullText' not in data:
         return jsonify({'error': 'No text provided'}), 400
     
@@ -143,7 +192,12 @@ def get_overall_summary():
             ]
         )
         
-        return jsonify(json.loads(chat_results[-1].summary))
+        # Get the initial summary in English
+        summary_result = json.loads(chat_results[-1].summary)
+        
+        # Translate if needed
+        translated_result = translate_content(summary_result, language)
+        return jsonify(translated_result)
         
     except Exception as e:
         print(f"Error: {str(e)}")
@@ -152,10 +206,16 @@ def get_overall_summary():
 @app.route('/analyze-section', methods=['POST'])
 def analyze_section():
     data = request.get_json()
+    language = data.get('language', 'en')
+    print(f"Section analysis request - Language: {language}")  # Debug log
+    
     if not data or 'sectionText' not in data or 'analysisType' not in data:
         return jsonify({'error': 'Missing required data'}), 400
     
     try:
+        # Get initial analysis in English
+        result = None
+        
         if data['analysisType'] == 'summary':
             agent = autogen.ConversableAgent(
                 name="section_summary_agent",
@@ -174,7 +234,6 @@ def analyze_section():
                 name="section_reference_agent",
                 system_message="""
                 Suggest related topics and references for this section.
-                For the references, look through the text and find all citations in the text. Match the references to the citations in the text. Collect all such references and return them in the same format as the citations including the number of the citation in the references attribute. If there are no references, return an empty array.
                 Return your response in this format:
                 {
                     "relatedTopics": [
@@ -195,8 +254,6 @@ def analyze_section():
                 """,
                 llm_config={"config_list": config_list, "timeout": 60}
             )
-        else:
-            return jsonify({'error': 'Invalid analysis type'}), 400
         
         user_proxy = autogen.UserProxyAgent(
             name="user_proxy",
@@ -215,7 +272,12 @@ def analyze_section():
             ]
         )
         
-        return jsonify(json.loads(chat_results[-1].summary))
+        # Get initial result in English
+        initial_result = json.loads(chat_results[-1].summary)
+        
+        # Translate if needed
+        translated_result = translate_content(initial_result, language)
+        return jsonify(translated_result)
         
     except Exception as e:
         print(f"Error: {str(e)}")

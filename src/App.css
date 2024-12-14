@@ -20,6 +20,7 @@ h1 {
   margin: 0;
   background: linear-gradient(45deg, #00f2fe, #4facfe);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -493,4 +494,27 @@ h1 {
 .reference-text {
   color: #8a8aa3;
   flex: 1;
+}
+
+.language-selector {
+  margin: 1rem 0;
+}
+
+.language-dropdown {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+}
+
+.language-dropdown:hover {
+  border-color: #888;
+}
+
+.language-dropdown:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0,102,204,0.2);
 }
