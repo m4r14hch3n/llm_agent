@@ -1,23 +1,32 @@
-## How to run the app
+## How to Run the App
 
-First, ensure that you have obtained an API key from OpenAI. 
+Follow these steps to set up and run the app:
 
-Then, create a `.env` file in your `backend` directory and add the following line:
-
-     ```plaintext
+1. **Set Up the API Key**:
+   - Obtain an API key from OpenAI.
+   - Navigate to the `backend` directory.
+   - Create a `.env` file and add the following line, replacing `your_openai_api_key_here` with your actual API key:
+     ```env
      OPENAI_API_KEY="your_openai_api_key_here"
      ```
 
-In the root directory, you can run:
+2. **Start the Backend**:
+   - Open a terminal in the root directory of the project.
+   - Run the following command to start the backend:
+     ```bash
+     python3 backend/backend.py
+     ```
 
-### `python3 backend/backend.py`
+3. **Start the Frontend**:
+   - Open another terminal in the root directory.
+   - Run the following command to start the frontend:
+     ```bash
+     npm start
+     ```
 
-Then in another terminal, also in the root directory, run:
+4. **Access the App**:
+   - Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
 
-### `npm start`
-
-Then open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
-
-Once the app is running, provide a link for analysis that ends in .pdf. For example:
-
-[https://arxiv.org/pdf/2412.10265.pdf](https://arxiv.org/pdf/2412.10265.pdf)
+5. **Use the App**:
+   - Once the app is running, provide a `.pdf` link for analysis. For example:
+     [https://arxiv.org/pdf/2412.10265.pdf](https://arxiv.org/pdf/2412.10265.pdf)
