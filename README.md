@@ -29,5 +29,6 @@ Follow these steps to set up and run the app:
 
 5. **Use the App**:
    - Once the app is running, provide a `.pdf` link for analysis. For example:
-     [https://www.redalyc.org/pdf/567/56745576016.pdf](https://www.redalyc.org/pdf/567/56745576016.pdf)
-     [https://arxiv.org/pdf/2303.08774.pdf](https://arxiv.org/pdf/2303.08774.pdf)
+    - [https://arxiv.org/pdf/1706.03762.pdf](https://arxiv.org/pdf/1706.03762.pdf)
+    - [https://www.redalyc.org/pdf/567/56745576016.pdf](https://www.redalyc.org/pdf/567/56745576016.pdf)
+
