@@ -27,7 +27,8 @@ CORS(app, resources={r"/*": {
 config_list = [
     {
         'model': 'gpt-4o-mini',
-        'api_key': os.getenv('OPENAI_API_KEY')
+        'api_key': os.getenv('OPENAI_API_KEY'),
+        "timeout": 90
     }
 ]
 
